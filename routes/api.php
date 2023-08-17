@@ -19,20 +19,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/test', function () {
-    return "hello!";
-});
-
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group( function () {
-    Route::post('logout', [AuthController::class, 'logout']);
     
     Route::post('/cart', [CartController::class, 'store']);
 
@@ -43,7 +34,13 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::post('/product', [BackofficeProductController::class, 'store']);
 
     Route::get('/order', [BackofficeOrderController::class, 'index']);
+    Route::patch('/order/{id}', [BackofficeOrderController::class, 'update_status']);
 
     Route::get('/summary-order', [BackofficeSummaryController::class, 'order_summary']);
+
+    Route::post('/order/import', [BackofficeOrderController::class, 'import']);
+    Route::get('/order/export', [BackofficeOrderController::class, 'export']);
+
+    Route::post('logout', [AuthController::class, 'logout']);
 });
 

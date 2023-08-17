@@ -16,6 +16,8 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id');
+            $table->string('code');
+            $table->integer('sequence');
             $table->boolean('is_complete')->default(0);
             $table->timestamps();
         });

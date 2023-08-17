@@ -9,11 +9,19 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $all_products = Product::all();
+        $all_products = Product::query();
 
-        return response()->json(['message' => 'success', 'data' => $all_products]);
+        if($request->has('search_text')){
+            $all_products = $all_products->where('name', 'like', '%' . $request->query('search_text') . '%');
+        }
+
+        if($request->has('is_in_stock')){
+            $all_products = $all_products->where('stock', $request->query('is_in_stock') ? '>' : '<=', '0');
+        }
+
+        return response()->json(['message' => 'success', 'data' => $all_products->get()]);
     }
     
     public function show($id)

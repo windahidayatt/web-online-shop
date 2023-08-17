@@ -30,21 +30,35 @@ class OrderController extends Controller
             return response()->json(['message' => 'Customer not found.'], 400);
         }
 
+        // check stock
+        $item_ids = array_column($request->order_items, 'product_id');
+        $products = Product::whereIn('id', $item_ids)->get();
+
+        foreach($request->order_items as $order_item){
+            $product = $products->find($order_item['product_id']);
+
+            if($product->stock < $order_item['qty']){
+                return response()->json(['message' => 'Sorry, product is out of stock.'], 400);
+            }
+        }
+        // end
+
+        // generate order code and sequence
+        $last_order = Order::whereYear('created_at', date("Y"))->whereMonth('created_at', date("M"))->orderBy('sequence', 'desc')->first();
+        $last_sequence = $last_order == null ? 1 : $last_order->sequence + 1;
         $order = Order::create([
             "customer_id" => $request->customer_id,
+            "sequence" => $last_sequence,
+            "code" => $last_sequence . date('my'),
         ]);
+        // end
 
         $cart_items = CartDetail::whereHas('cart', function ($query) use ($request) {
             return $query->where('customer_id', '=', $request->customer_id);
         })->get();
 
         foreach($request->order_items as $order_item){
-            $product = Product::find($order_item['product_id']);
-
-            if($product->stock < $order_item['qty']){
-                return response()->json(['message' => 'Sorry, product is out of stock.'], 400);
-            }
-
+            $product = $products->find($order_item['product_id']);
             $new_order = OrderDetail::create([
                 'order_id' => $order->id,
                 'product_id' => $order_item['product_id'],
