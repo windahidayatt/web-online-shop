@@ -36,7 +36,9 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('/order', [BackofficeOrderController::class, 'index']);
     Route::patch('/order/{id}', [BackofficeOrderController::class, 'update_status']);
 
-    Route::get('/summary-order', [BackofficeSummaryController::class, 'order_summary']);
+    Route::get('/summary/order', [BackofficeSummaryController::class, 'order_summary']);
+    Route::get('/summary/product', [BackofficeSummaryController::class, 'product_summary']);
+    Route::get('/summary/order-per-product', [BackofficeSummaryController::class, 'order_per_product']);
 
     Route::post('/order/import', [BackofficeOrderController::class, 'import']);
     Route::get('/order/export', [BackofficeOrderController::class, 'export']);
